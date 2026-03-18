@@ -634,7 +634,7 @@ html, body {
         </div>
         <div class="flow-connector"><span class="arrow">&#x25bc;</span><span class="label">Fiat settlement</span></div>
         <div class="flow-box" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:var(--amber);font-weight:600;">&#x1f3e6; Foundation IBAN (NL/EU)</div>
-        <div class="flow-connector"><span class="arrow">&#x25bc;</span><span class="label">Auto-convert via Circle Mint / Monerium</span></div>
+        <div class="flow-connector"><span class="arrow">&#x25bc;</span><span class="label">Batch-convert via Circle Mint wire (daily settlement)</span></div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;">
           <div style="font-family:var(--font-mono);font-size:0.6rem;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;">Multi-Chain Treasury &mdash; Native EURC Chains</div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
@@ -774,8 +774,8 @@ html, body {
         </div>
         <div class="svc-card" style="border-left:3px solid var(--emerald);">
           <div class="svc-num">S04</div>
-          <div class="svc-name">On-Ramp Conversion</div>
-          <div class="svc-desc">Auto-convert EUR &rarr; EURC via Circle Mint programmatic API.</div>
+          <div class="svc-name">Fiat-to-Stablecoin</div>
+          <div class="svc-desc">Batch-convert collected EUR &rarr; EURC via Circle Mint wire. Daily settlement to foundation wallet.</div>
         </div>
         <div class="svc-card" style="border-left:3px solid var(--emerald);">
           <div class="svc-num">S05</div>
@@ -1001,9 +1001,9 @@ opencharities.card.transaction.<span class="str">settled</span>
         </div>
         <div class="timeline-step">
           <div class="timeline-dot" style="background:var(--cyan);color:var(--cyan);"></div>
-          <div class="tl-title">Conversion</div>
-          <div class="tl-desc">EUR &rarr; EURC via Circle Mint. Stablecoin minted to foundation wallet.</div>
-          <div class="tl-time">30-60s</div>
+          <div class="tl-title">Batch Settlement</div>
+          <div class="tl-desc">Collected EUR wired to Circle Mint in daily batch. EURC minted to foundation wallet.</div>
+          <div class="tl-time">daily batch</div>
         </div>
         <div class="timeline-step">
           <div class="timeline-dot" style="background:var(--violet);color:var(--violet);"></div>
@@ -1023,7 +1023,7 @@ opencharities.card.transaction.<span class="str">settled</span>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;font-size:0.75rem;">
           <div><span style="color:var(--text-muted);">Payment fails</span><br><span style="color:var(--rose);">&rarr; Cancel donation</span></div>
           <div><span style="color:var(--text-muted);">KYC rejected</span><br><span style="color:var(--rose);">&rarr; Refund payment</span></div>
-          <div><span style="color:var(--text-muted);">Conversion fails (3x)</span><br><span style="color:var(--rose);">&rarr; Hold fiat, alert admin</span></div>
+          <div><span style="color:var(--text-muted);">Batch mint fails</span><br><span style="color:var(--rose);">&rarr; Hold fiat in IBAN, alert admin</span></div>
         </div>
       </div>
     </div>
@@ -1274,8 +1274,8 @@ opencharities.card.transaction.<span class="str">settled</span>
         <div class="adr-card">
           <div class="adr-id">ADR-007</div>
           <div class="adr-title">On/Off-Ramp</div>
-          <div class="adr-decision">Circle Mint + Monerium</div>
-          <div class="adr-reason">Circle: direct EURC mint/redeem, lowest fees. Monerium: IBAN-native stablecoin for seamless SEPA integration.</div>
+          <div class="adr-decision">Circle Mint (batch) + Monerium</div>
+          <div class="adr-reason">Circle: batch EUR wire &rarr; EURC mint (daily settlement). Monerium: IBAN-native EURe for smaller real-time flows. No per-donation minting.</div>
         </div>
         <div class="adr-card">
           <div class="adr-id">ADR-008</div>
@@ -1337,7 +1337,7 @@ JournalEntry.ref     <span class="fn">&rarr;</span> <span class="cmt">varies by 
             <h4 style="font-family:var(--font-display);font-weight:700;font-size:0.85rem;margin-bottom:12px;color:var(--emerald);">Data Flows</h4>
             <div style="font-size:0.78rem;color:var(--text-secondary);line-height:2;">
               <strong style="color:var(--text-primary);">Donation &rarr; Treasury:</strong><br>
-              <span style="color:var(--text-muted);">Payment(S03) &rarr; Donation(S02) &rarr; Conversion(S04) &rarr; Wallet(S05) &rarr; Ledger(S12) &rarr; Dashboard(S10)</span>
+              <span style="color:var(--text-muted);">Payment(S03) &rarr; Donation(S02) &rarr; Batch Mint(S04, daily) &rarr; Wallet(S05) &rarr; Ledger(S12) &rarr; Dashboard(S10)</span>
               <br><br>
               <strong style="color:var(--text-primary);">Foundation &rarr; Organizer:</strong><br>
               <span style="color:var(--text-muted);">Disbursement(S06) &rarr; Transfer(S05) &rarr; Ledger(S12) &rarr; Dashboard(S10)</span>
@@ -1392,7 +1392,7 @@ JournalEntry.ref     <span class="fn">&rarr;</span> <span class="cmt">varies by 
             <tbody>
               <tr><td>Donation processing (card)</td><td style="color:var(--emerald);">&lt; 5 seconds</td></tr>
               <tr><td>Donation processing (iDEAL)</td><td style="color:var(--amber);">&lt; 30 seconds</td></tr>
-              <tr><td>Fiat &rarr; EURC conversion</td><td style="color:var(--amber);">&lt; 60 seconds (real-time)</td></tr>
+              <tr><td>Fiat &rarr; EURC settlement</td><td style="color:var(--amber);">&lt; 24 hours (daily batch)</td></tr>
               <tr><td>Disbursement (on-chain)</td><td style="color:var(--emerald);">&lt; 30 seconds</td></tr>
               <tr><td>Card authorization</td><td style="color:var(--emerald);">&lt; 500ms</td></tr>
               <tr><td>IBAN withdrawal</td><td style="color:var(--rose);">&lt; 24 hours (SEPA)</td></tr>
